@@ -8,18 +8,6 @@
 
 #include "string_utils.h"
 
-
-std::string LfsPointer::toString() const
-{
-	std::string content("version https://git-lfs.github.com/spec/v1\noid sha256:");
-	content += this->oid + '\n';
-	content += "size " + std::to_string(this->size) + "\n\n";
-	return content;
-}
-
-
-
-
 template<class T>
 constexpr std::optional<T> to_int(const std::string_view& input)
 {
@@ -56,6 +44,20 @@ std::vector<std::string_view> split(const std::string_view& s, char delimiter)
 	return output;
 }
 
+
+std::string LfsPointer::toString() const
+{
+	std::string content("version https://git-lfs.github.com/spec/v1\noid sha256:");
+	content += this->oid + '\n';
+	content += "size " + std::to_string(this->size) + "\n\n";
+	return content;
+}
+
+
+
+
+
+
 LfsPointer LfsPointer::fromString(const std::string& rep)
 {
 	// example:
@@ -64,7 +66,7 @@ LfsPointer LfsPointer::fromString(const std::string& rep)
 	// size 12345
 
 	constexpr size_t shaHeadLength = std::char_traits<char>::length("sha256:");
-	LfsPointer lfsPoiner;
+	
 	static const std::string_view line1("version https://git-lfs.github.com/spec/v1\n");
 	const std::string normalLineEnd = string_replace(rep, "\r\n", "\n");
 	std::string_view repView(normalLineEnd);
@@ -76,21 +78,38 @@ LfsPointer LfsPointer::fromString(const std::string& rep)
 	repView.remove_prefix(line1.size());
 	auto lines = split(repView, '\n');
 
+	bool foundOid = false;
+	bool foundSize = false;
+	LfsPointer lfsPoiner;
+
 	for (const auto& line : lines)
 	{
-		const auto tokens = split(line, ' ');
-		if (tokens[0] == "oid")
+		auto spacePos = line.find(' ');
+		if (spacePos != line.npos)
 		{
-			if (!tokens[1].starts_with("sha256:"))
-				throw std::runtime_error("Unsupported hash function for oid, only sha256 is supportedS");
+			auto token0 = line.substr(0, spacePos);
+			auto token1 = line.substr(spacePos + 1);
 
-			lfsPoiner.oid = tokens[1].substr(shaHeadLength);
+			if (token0 == "oid")
+			{
+				if (!token1.starts_with("sha256:"))
+					throw std::runtime_error("Unsupported hash function for oid, only sha256 is supportedS");
+
+				lfsPoiner.oid = token1.substr(shaHeadLength);
+				foundOid = true;
+			}
+
+			if (token0 == "size")
+			{
+				lfsPoiner.size = std::stoll(token1.data());
+				foundSize = true;
+			}
 		}
-			
-
-		if (tokens[0] == "size")
-			lfsPoiner.size = std::stoll(tokens[1].data());
+		
 	}
+
+	if (!(foundOid && foundSize))
+		throw std::runtime_error("File does not look like a lfs pointer");
 
 	return lfsPoiner;
 }

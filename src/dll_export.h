@@ -12,7 +12,7 @@
 		#define  GIT_LFS_LIB_DLL_EXPORT __declspec(dllimport)
 	#endif /* MyLibrary_EXPORTS */
 #else /* defined (_WIN32) */
-	#define MYLIB_EXPORT
+	#define GIT_LFS_LIB_DLL_EXPORT
 #endif
 
 
