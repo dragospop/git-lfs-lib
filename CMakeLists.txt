@@ -5,6 +5,9 @@ cmake_minimum_required (VERSION 3.10)
 
 project ("git-lfs-lib")
 
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(conan_install)
 OPTION (ENABLE_UNIT_TEST "Enable unite tests" ON)
 
 set(CMAKE_CXX_STANDARD 20)

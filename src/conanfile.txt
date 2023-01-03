@@ -1,0 +1,6 @@
+[requires]
+cpr/1.9.3
+hash-library/8.0
+
+[generators]
+cmake_multi

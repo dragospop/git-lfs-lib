@@ -2,12 +2,12 @@
 # project specific logic here.
 #
 cmake_minimum_required (VERSION 3.10)
-
-
 project ("git-lfs-lib")
 
+INSTALL_CONAN_DEPS()
 
 OPTION (BUILD_SHARED_LIBS "Build Shared Libraries" ON)
+
 # Set the LIB_TYPE variable to STATIC
 
 IF (BUILD_SHARED_LIBS)
@@ -47,10 +47,10 @@ message(STATUS "CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} ")
 
 # Add source to this project's executable.
 #add_library (git-lfs-lib SHARED "git-lfs-lib.cpp" "git-lfs-lib.h")
-add_library (git-lfs-lib ${LIB_TYPE} ${GIT_LFS_LIB_SRCS} ${GIT_LFS_LIB_ALL_HEADERS} "lfs/lfs_comm.cpp" "lfs/lfs_comm.h")
-set_target_properties(git-lfs-lib PROPERTIES LINKER_LANGUAGE CXX)
-target_include_directories(git-lfs-lib PUBLIC
-  $<INSTALL_INTERFACE:include/git-lfs-lib>  # <prefix>/include/mylib
+add_library (${PROJECT_NAME} ${LIB_TYPE} ${GIT_LFS_LIB_SRCS} ${GIT_LFS_LIB_ALL_HEADERS})
+set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>  # <prefix>/include/mylib
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -60,6 +60,8 @@ IF (BUILD_SHARED_LIBS)
 ELSE()
   SET_TARGET_PROPERTIES (${PROJECT_NAME} PROPERTIES DEFINE_SYMBOL  "GIT_LFS_LIB_EXTPORTS_STATIC" )
 ENDIF (BUILD_SHARED_LIBS)
+
+CONAN_MULTI_LINK(${PROJECT_NAME})
 # include (GenerateExportHeader)
 # 
 # GENERATE_EXPORT_HEADER( ${PROJECT_NAME}
@@ -80,6 +82,7 @@ install(
     INCLUDES DESTINATION "${include_install_dir}"
 )
 
+message(STATUS "CONAN_LIBS = ${CONAN_LIBS}")
 message(STATUS "INCLUDE_INSTALL_DIR=${INCLUDE_INSTALL_DIR} ") 
 
 install(FILES
