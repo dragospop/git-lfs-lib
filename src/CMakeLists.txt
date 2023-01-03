@@ -30,9 +30,9 @@ set(LIB_INSTALL_DIR "lib" )
 
 
 
-list(APPEND GIT_LFS_LIB_SRCS lfs_pointer.cpp)
+list(APPEND GIT_LFS_LIB_SRCS "lfs/lfs_pointer.cpp" "lfs/lfs_pointer.cpp")
 
-list(APPEND GIT_LFS_LIB_ALL_HEADERS "lfs_pointer.h" "dll_export.h" "string_utils.h")
+list(APPEND GIT_LFS_LIB_ALL_HEADERS "lfs/lfs_pointer.h" "lfs/lfs_comm.h" "dll_export.h" "string_utils.h")
 
 file(COPY ${GIT_LFS_LIB_ALL_HEADERS}
     DESTINATION ${INCLUDE_INSTALL_DIR}
@@ -45,13 +45,13 @@ message(STATUS "CMAKE_CURRENT_SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} ")
 
 
 
-
 # Add source to this project's executable.
 #add_library (git-lfs-lib SHARED "git-lfs-lib.cpp" "git-lfs-lib.h")
-add_library (git-lfs-lib ${LIB_TYPE} ${GIT_LFS_LIB_SRCS} ${GIT_LFS_LIB_ALL_HEADERS} "lfs_comm.cpp" "lfs_comm.h")
+add_library (git-lfs-lib ${LIB_TYPE} ${GIT_LFS_LIB_SRCS} ${GIT_LFS_LIB_ALL_HEADERS} "lfs/lfs_comm.cpp" "lfs/lfs_comm.h")
 set_target_properties(git-lfs-lib PROPERTIES LINKER_LANGUAGE CXX)
 target_include_directories(git-lfs-lib PUBLIC
   $<INSTALL_INTERFACE:include/git-lfs-lib>  # <prefix>/include/mylib
+  ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 

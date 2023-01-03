@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.15)
 
-
+set(MY_OUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY_1 = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 
@@ -19,24 +19,22 @@ endif()
 
 include(${CMAKE_BINARY_DIR}/conan.cmake)
 
-conan_cmake_autodetect(settings)
+set(CMAKE_CURRENT_BINARY_DIR ${CMAKE_BINARY_DIR})
 
-conan_cmake_install(PATH_OR_REFERENCE .
-                    BUILD missing
-                    REMOTE conancenter
-                    SETTINGS ${settings})
+conan_cmake_run(CONANFILE conanfile.txt
+                OUTPUT_FOLDER ${CMAKE_BINARY_DIR}
+                BASIC_SETUP)
 
-# message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY_3 = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-# conan_cmake_run(CONANFILE conanfile.txt  # or relative build/conanfile.txt
-#                 BASIC_SETUP CMAKE_TARGETS
-#                 INSTALL_FOLDER "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-#                 BUILD missing)
-# 
-# message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY_4 = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
-include(${CMAKE_BINARY_DIR}/test/conanbuildinfo_multi.cmake)
-# 
-conan_basic_setup()
-# 
+#conan_cmake_install(PATH_OR_REFERENCE .
+#                    BUILD missing
+#                    REMOTE conancenter
+#                    SETTINGS ${settings})
+
+message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY_2 = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
+conan_basic_setup(TARGETS)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${MY_OUT_DIR})
 message(STATUS "CMAKE_RUNTIME_OUTPUT_DIRECTORY_5 = ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 project ("git-lfs-lib-test")
 
@@ -68,11 +66,20 @@ target_link_libraries(${PROJECT_NAME} git-lfs-lib)
 #gtest_discover_tests(${PROJECT_NAME} TEST_PREFIX gtest)
 #add_test(NAME unit_tst COMMAND ${PROJECT_NAME})
 
+message(STATUS "CONAN_LIBS_RELEASE = ${CONAN_LIBS}")
+message(STATUS "CONAN_LIBS_RELEASE = ${CONAN_LIBS_RELEASE}")
+message(STATUS "CONAN_LIBS_DEBUG = ${CONAN_LIBS_DEBUG}")
+
+foreach(_LIB ${CONAN_LIBS})
+    target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS})
+endforeach()
 foreach(_LIB ${CONAN_LIBS_RELEASE})
     target_link_libraries(${PROJECT_NAME} optimized ${_LIB})
+    message(STATUS "Lib = ${_LIB}")
 endforeach()
 foreach(_LIB ${CONAN_LIBS_DEBUG})
     target_link_libraries(${PROJECT_NAME} debug ${_LIB})
+    message(STATUS "Lib = ${_LIB}")
 endforeach()
 
 message(STATUS "ProjectName = ${PROJECT_NAME}")

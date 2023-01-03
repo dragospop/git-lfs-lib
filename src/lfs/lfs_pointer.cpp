@@ -8,17 +8,18 @@
 
 #include "string_utils.h"
 
-template<class T>
-constexpr std::optional<T> to_int(const std::string_view& input)
-{
-	T out;
-	const std::from_chars_result result = std::from_chars(input.data(), input.data() + input.size(), out);
-	if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range)
-	{
-		return std::nullopt;
-	}
-	return out;
-}
+//template<class T>
+//constexpr std::optional<T> to_int(const std::string_view& input)
+//{
+//	std::stoi(input);
+//	T out;
+//	const std::from_chars_result result = std::from_chars(input.data(), input.data() + input.size(), out);
+//	if (result.ec == std::errc::invalid_argument || result.ec == std::errc::result_out_of_range)
+//	{
+//		return std::nullopt;
+//	}
+//	return out;
+//}
 
 std::vector<std::string_view> split(const std::string_view& s, char delimiter)
 {
