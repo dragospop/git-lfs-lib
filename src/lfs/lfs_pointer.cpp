@@ -1,4 +1,6 @@
 #include "lfs_pointer.h"
+#include "sha256.h"
+#include <fstream>
 #include <stdexcept>
 #include <ranges>
 #include <vector>
@@ -113,4 +115,28 @@ LfsPointer LfsPointer::fromString(const std::string& rep)
 		throw std::runtime_error("File does not look like a lfs pointer");
 
 	return lfsPoiner;
+}
+
+LfsPointer LfsPointer::getPointer(const std::filesystem::path& file)
+{
+	if (std::ifstream is{ file, std::ios::binary | std::ios::ate }) {
+		auto fileSize = is.tellg();
+		std::string str(fileSize, '\0'); // construct string to stream size
+		is.seekg(0);
+		if (is.read(&str[0], fileSize))
+		{
+			SHA256 sha256;
+			std::string fileHash = sha256(str.data(), fileSize);
+
+			LfsPointer lfsPoiner;
+			lfsPoiner.size = fileSize;
+			lfsPoiner.oid = fileHash;
+
+			return lfsPoiner;
+		}
+	}
+	else
+	{
+		throw std::runtime_error("Coulld not read file");
+	}
 }

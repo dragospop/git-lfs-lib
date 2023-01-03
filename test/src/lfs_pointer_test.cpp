@@ -1,6 +1,10 @@
 #include <string>
+#include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
 #include <git-lfs-lib/lfs_pointer.h>
+
+namespace fs = std::filesystem;
 
 class LfsPointerTest : public ::testing::Test
 {
@@ -88,6 +92,38 @@ TEST_F(LfsPointerTest, fromString_badFormat) {
 	ASSERT_THROW(LfsPointer::fromString(bad2), std::runtime_error);
 	ASSERT_THROW(LfsPointer::fromString(bad3), std::runtime_error);
 	ASSERT_THROW(LfsPointer::fromString(bad4), std::runtime_error);
+}
+
+TEST_F(LfsPointerTest, getPointer) 
+{
+	auto tempDir = fs::temp_directory_path();
+	auto tempTestDir = tempDir / "LfsLibTest" / "LfsPointerTest";
+	auto tempFile = tempTestDir / "getPointer.txt";
+
+	fs::create_directories(tempTestDir);
+
+	int fileSize = 0;
+
+	if (fs::exists(tempFile))
+		fs::remove(tempFile);
+
+	{
+		std::ofstream ofile(tempFile, std::ios::binary);
+		int n = 0x41424344;
+		fileSize += sizeof(n) + 1;
+		ofile.write(reinterpret_cast<char*>(&n), sizeof(n)) << '\n';
+
+		char c[] = "This is sample text.\n";
+		ofile.write(c, sizeof(c) ).write("!\n", 2);
+		fileSize += sizeof(c) + 2;
+	}
+
+	auto ptr = LfsPointer::getPointer(tempFile);
+
+
+	ASSERT_EQ(fileSize, ptr.size);
+	ASSERT_EQ(256 / 4, ptr.oid.size()); // total bits = 256; hex = 4
+	ASSERT_EQ("087a02044a1299a0ffa1eb40001a724991fd8a8723c1d3928a8f15dedfa73e3a", ptr.oid);
 }
 
 TEST_F(LfsPointerTest, IFail) {

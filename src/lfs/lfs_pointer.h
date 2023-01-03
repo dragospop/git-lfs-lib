@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <filesystem>
 #include "dll_export.h"
 
 /// <summary>
@@ -13,4 +14,6 @@ public:
 
 	std::string toString() const;
 	static LfsPointer fromString(const std::string& rep);
+
+	static LfsPointer getPointer(const std::filesystem::path& file);
 };
