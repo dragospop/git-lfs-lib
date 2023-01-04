@@ -1,6 +1,7 @@
 [requires]
 cpr/1.9.3
 hash-library/8.0
+nlohmann_json/3.11.2
 
 [generators]
 cmake_multi

@@ -1,23 +1,38 @@
 #pragma once
 #include <filesystem>
-#include "../../include/git-lfs-lib/lfs_pointer.h"
+#include <vector>
+#include "comm/comm_action.h"
+#include "lfs_pointer.h"
 
-/// <summary>
-/// This class handles the comunication with a GitLfs server
-/// </summary>
-class LfsComm
+namespace lfslib
 {
-public:
-	LfsComm();
-	~LfsComm();
+	/// <summary>
+	/// This class handles the comunication with a GitLfs server
+	/// </summary>
+	class GIT_LFS_LIB_DLL_EXPORT LfsComm
+	{
+	public:
+		LfsComm();
+		~LfsComm();
 
-	LfsPointer upload(const std::filesystem::path & file);
-	void download(const std::filesystem::path& file, const LfsPointer& ptr );
-	void download(const std::filesystem::path& file, const std::string& oid, int64_t size);
-	
+		LfsPointer upload(const std::filesystem::path& file);
+		void download(const std::filesystem::path& file, const LfsPointer& ptr);
+		void download(const std::filesystem::path& file, const std::string& oid, int64_t size);
 
-private:
 
-};
+	private:
+		using CommObj = lfslib::comm::Object;
+		using Batch = lfslib::comm::Batch;
+		using Action = lfslib::comm::Action;
+
+		void runBatch(const Batch& batch);
+		std::vector<CommObj> sendBatch(const Batch& batch);
+		void doActions(std::vector<CommObj>& objects);
+		void downloadAction(const CommObj& obj);
+		void uploadAction(const CommObj& obj);
+
+	};
+}
+
 
 

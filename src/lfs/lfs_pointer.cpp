@@ -8,7 +8,7 @@
 #include <optional>
 #include <charconv>
 
-#include "string_utils.h"
+#include "utils/string_utils.h"
 
 //template<class T>
 //constexpr std::optional<T> to_int(const std::string_view& input)
@@ -119,21 +119,23 @@ LfsPointer LfsPointer::fromString(const std::string& rep)
 
 LfsPointer LfsPointer::getPointer(const std::filesystem::path& file)
 {
-	if (std::ifstream is{ file, std::ios::binary | std::ios::ate }) {
-		auto fileSize = is.tellg();
-		std::string str(fileSize, '\0'); // construct string to stream size
-		is.seekg(0);
-		if (is.read(&str[0], fileSize))
-		{
-			SHA256 sha256;
-			std::string fileHash = sha256(str.data(), fileSize);
+	std::ifstream is{ file, std::ios::binary | std::ios::ate };
+	if (!is) {
+		throw std::runtime_error("Coulld not open file");
+	}
+	auto fileSize = is.tellg();
+	std::string str(fileSize, '\0'); // construct string to stream size
+	is.seekg(0);
+	if (is.read(&str[0], fileSize))
+	{
+		SHA256 sha256;
+		std::string fileHash = sha256(str.data(), fileSize);
 
-			LfsPointer lfsPoiner;
-			lfsPoiner.size = fileSize;
-			lfsPoiner.oid = fileHash;
+		LfsPointer lfsPoiner;
+		lfsPoiner.size = fileSize;
+		lfsPoiner.oid = fileHash;
 
-			return lfsPoiner;
-		}
+		return lfsPoiner;
 	}
 	else
 	{
