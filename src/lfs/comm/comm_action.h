@@ -86,6 +86,9 @@ namespace lfslib::comm
 		to_json(jobjects, b.objects);
 
 		j = json{ {"operation", b.operation}, {"transfers", std::array<std::string, 1> {"basic"}}, {"objects", jobjects}, {"hash_algo", "sha256"} };
+
+		if (!b.ref.empty())
+			j["ref"] = b.ref;
 	}
 
 

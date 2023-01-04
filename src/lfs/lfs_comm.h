@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <vector>
+#include <cpr/cprtypes.h>
 #include "comm/comm_action.h"
 #include "lfs_pointer.h"
 
@@ -31,6 +32,12 @@ namespace lfslib
 		void downloadAction(const CommObj& obj);
 		void uploadAction(const CommObj& obj);
 
+	private:
+		std::string url;
+		std::unordered_map<LfsPointer, std::filesystem::path> ptrToFile;
+
+		static const std::string contentType;
+		static const cpr::Header stdHeader;
 	};
 }
 
