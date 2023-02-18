@@ -101,7 +101,7 @@ void LfsComm::downloadAction(const LfsComm::CommObj& obj)
     if (!ptrToFile.contains(obj.ptr))
         throw std::runtime_error("Lfs Upload: Pointer file not found");
 
-    auto filePath = ptrToFile[obj.ptr];
+    const auto& filePath = ptrToFile[obj.ptr];
 
     std::ofstream os{ filePath, std::ios::binary };
     if (!os)
@@ -123,7 +123,7 @@ void LfsComm::uploadAction(const LfsComm::CommObj& obj)
     if (!ptrToFile.contains(obj.ptr))
         throw std::runtime_error("Lfs Upload: Pointer file not found");
 
-    auto filePath = ptrToFile[obj.ptr];
+    const auto& filePath = ptrToFile[obj.ptr];
 
     std::ifstream is{ filePath, std::ios::binary | std::ios::ate };
     if (!is)
